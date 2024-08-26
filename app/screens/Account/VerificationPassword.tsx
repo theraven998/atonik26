@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useLayoutEffect } from "react";
 import {
   View,
   TextInput,
@@ -11,12 +11,11 @@ import {
 } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import axios from "axios";
+import { useNavigation, router } from 'expo-router';
 
-interface VerificationPasswordProps {
-  navigation: any;
-}
 
-const VerificationPassword: React.FC<VerificationPasswordProps> = ({ navigation }) => {
+const VerificationPassword: React.FC = () => {
+  const navigation = useNavigation();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [isCodeSent, setIsCodeSent] = useState(false);
@@ -29,7 +28,7 @@ const VerificationPassword: React.FC<VerificationPasswordProps> = ({ navigation 
     }
 
     try {
-      const response = await axios.post("http://192.168.20.8:5000/api/send_verification_code", {
+      const response = await axios.post("http://192.168.20.9:5000/api/send_verification_code", {
         phone: phoneNumber,
       });
 
@@ -58,10 +57,14 @@ const VerificationPassword: React.FC<VerificationPasswordProps> = ({ navigation 
       });
     }, 1000);
   };
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  }, [navigation]);
 
   const handleContinue = () => {
     Alert.alert("Código Verificado", "El código ingresado es correcto.");
-    navigation.navigate("NextScreen"); // Reemplazar con la pantalla adecuada
   };
 
   return (
@@ -99,7 +102,7 @@ const VerificationPassword: React.FC<VerificationPasswordProps> = ({ navigation 
             {!isCodeSent ? (
               <TextInput
                 style={styles.input}
-                placeholder="Teléfono"
+                placeholder="Teléfono con prefijo"
                 placeholderTextColor="rgba(255, 255, 255, 0.7)"
                 keyboardType="phone-pad"
                 value={phoneNumber}

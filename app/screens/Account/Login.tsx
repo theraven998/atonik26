@@ -9,11 +9,12 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
+  Pressable
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from 'expo-router';
+import { useNavigation, router } from "expo-router";
 
 const { width, height } = Dimensions.get('window');
 const buttonWidth = width * 0.5;
@@ -33,7 +34,7 @@ const Login: React.FC = () => {
 
   const logueo = async () => {
     try {
-      const response = await axios.post('http://192.168.20.21:5000/api/login', {
+      const response = await axios.post('http://192.168.20.9:5000/api/login', {
         usuario,
         password,
       });
@@ -41,6 +42,10 @@ const Login: React.FC = () => {
       if (response && response.data) {
         Alert.alert('Loggeado');
         await AsyncStorage.setItem('access_token', response.data.access_token);
+        router.push({
+          pathname: '/(tabs)/profile',
+        });
+        
       } else {
         Alert.alert('Error', 'La respuesta no contiene datos');
       }
@@ -111,8 +116,17 @@ const Login: React.FC = () => {
               </TouchableOpacity>
             </View>
             <View style={styles.cajaforgot}>
-              <Text style={styles.contrasenaolvidada}>Olvide mi Contraseña</Text>
-            </View>
+            <Pressable
+
+              onPress={() =>
+                router.push({
+                  pathname: "/screens/Account/VerificationPassword",
+                })
+              }
+            >
+              <Text style={styles.contrasenaolvidada}>Olvide mi contraseña</Text>
+            </Pressable>
+          </View>
           </View>
           <View style={styles.buttoncaja}>
             <TouchableOpacity style={[styles.button, { width: buttonWidth, height: buttonHeight }]} onPress={logueo}>

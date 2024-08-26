@@ -1,8 +1,21 @@
 import React, { useEffect } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, TouchableWithoutFeedback, Dimensions } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Dimensions,
+} from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from "react-native-reanimated";
 import atonik from "../assets/images/atonikName.png";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
+import { router, Link } from "expo-router";
 
 export default function Panel({ isVisible, togglePanel, closePanel }) {
   const translateY = useSharedValue(300); // Posición inicial fuera de la pantalla
@@ -10,7 +23,7 @@ export default function Panel({ isVisible, togglePanel, closePanel }) {
   useEffect(() => {
     translateY.value = withSpring(isVisible ? 0 : 300, {
       damping: 20,
-      stiffness:100,
+      stiffness: 100,
     }); // Mover el panel arriba o abajo con una animación más suave
   }, [isVisible]);
   const animatedStyle = useAnimatedStyle(() => {
@@ -33,10 +46,24 @@ export default function Panel({ isVisible, togglePanel, closePanel }) {
             <View style={styles.panelHandle} />
             <Image source={atonik} style={styles.panelImage} />
             <Text style={styles.panelText}>Inicia sesión o crea tu cuenta</Text>
-            <TouchableOpacity onPress={() => navigation.navigate("screens/Account/Login")} style={styles.panelButton}>
+            <TouchableOpacity
+              onPress={() =>
+                router.push({
+                  pathname: "/screens/Account/Login",
+                })
+              }
+              style={styles.panelButton}
+            >
               <Text style={styles.panelButtonText}>Iniciar sesión</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate("screens/Account/Register")} style={styles.panelButton}>
+            <TouchableOpacity
+              onPress={() =>
+                router.push({
+                  pathname: "/screens/Account/Register",
+                })
+              }
+              style={styles.panelButton}
+            >
               <Text style={styles.panelButtonText2}>Crear cuenta</Text>
             </TouchableOpacity>
           </View>
@@ -48,20 +75,20 @@ export default function Panel({ isVisible, togglePanel, closePanel }) {
 
 const styles = StyleSheet.create({
   panel: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
     height: 300,
-    backgroundColor: '#1f1e1e',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#1f1e1e",
+    justifyContent: "center",
+    alignItems: "center",
     borderTopEndRadius: 20,
     borderTopStartRadius: 20,
   },
   panelContent: {
-    width: Dimensions.get('window').width,
-    alignItems: 'center',
+    width: Dimensions.get("window").width,
+    alignItems: "center",
     height: 300,
   },
   panelHandle: {
@@ -84,14 +111,14 @@ const styles = StyleSheet.create({
   },
   panelButton: {
     marginTop: 20,
-    backgroundColor: '#694fdb',
+    backgroundColor: "#694fdb",
     paddingHorizontal: "17%",
     paddingVertical: 10,
     borderRadius: 10,
   },
   panelButton2: {
     marginTop: 20,
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
     paddingHorizontal: "12%",
     paddingVertical: 10,
     borderRadius: 10,
@@ -108,6 +135,6 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
 });

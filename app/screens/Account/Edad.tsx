@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import {
   View,
   TextInput,
@@ -11,20 +11,11 @@ import {
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Svg, { Path } from "react-native-svg";
+import { useNavigation, router, useLocalSearchParams } from "expo-router";
 
-interface EdadProps {
-  navigation: any;
-  route: {
-    params: {
-      Nombre: string;
-      User: string;
-      Number: string;
-      password: string;
-    };
-  };
-}
-
-const Edad: React.FC<EdadProps> = ({ navigation, route }) => {
+const Edad: React.FC = () => {
+  const navigation = useNavigation();
+  const { Nombre, User, Number, password } = useLocalSearchParams(); // Obtener los parámetros de la búsqueda
   const [Fecha, setFecha] = useState<Date | undefined>(undefined);
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
   const [edad, setEdad] = useState<{
@@ -33,12 +24,18 @@ const Edad: React.FC<EdadProps> = ({ navigation, route }) => {
     dias: number;
   } | null>(null);
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false, // Oculta el encabezado
+    });
+  }, [navigation]);
+
   useEffect(() => {
-    if (!route.params) {
-      Alert.alert("Error", "Datos del usuario no proporcionados");
-      navigation.goBack();
+    if (!Nombre || !User || !Number || !password) {
+     // Alert.alert("Error", "Datos del usuario no proporcionados");
+      // Aquí deberías manejar la navegación de vuelta a la pantalla anterior o algún otro flujo adecuado
     }
-  }, [route.params]);
+  }, [Nombre, User, Number, password]);
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
     if (selectedDate) {
@@ -85,16 +82,16 @@ const Edad: React.FC<EdadProps> = ({ navigation, route }) => {
     } else {
       if (edad && edad.anios >= 18) {
         try {
-          const response = await fetch("http://192.168.20.21:5000/api/register", {
+          const response = await fetch("http://192.168.20.9:5000/api/register", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              name: route.params.Nombre,
-              username: route.params.User,
-              phone: route.params.Number,
-              password: route.params.password,
+              name: Nombre,
+              username: User,
+              phone: Number,
+              password: password,
               birthdate: Fecha.toISOString().split('T')[0],
             }),
           });
@@ -281,99 +278,96 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     position: "relative",
   },
-  button: {
-    top: "70%",
-    width: '65%',
-    height: '15%',
-    position: 'absolute',
-    backgroundColor: '#ffffff',
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: "#000000",
-    fontSize: 17,
-    fontWeight: "500",
-  },
-  iconuser: {
-    height: 30,
-    width: 30,
-  },
   cajabienvenida: {
-    width: "100%",
-    height: "15%",
-    position: "absolute",
-    top: 0,
+    width: 320,
+    height: 70,
     justifyContent: "center",
     alignItems: "center",
+    position: "absolute",
+    top: '-3%',
   },
   bienvenida: {
-    position: "absolute",
     color: "white",
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
   },
   cajainputs: {
     position: "absolute",
-    width: "95%",
-    height: "15%",
-    top: "12%",
-    alignItems: "center",
+    top: "15%",
+    width: "100%",
     justifyContent: "center",
+    alignItems: "center",
+  },
+  inputcaja: {
+    borderBottomWidth: 1,
+    borderRadius: 8,
+    borderColor: "#FFFFFF",
+    width: "90%",
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: "#FFFFFF",
+  },
+  iconuser: {
+    width: 20,
+    height: 20,
+    marginRight: 10,
   },
   cajainferior: {
     position: "absolute",
+    top: "36%",
     width: "100%",
-    height: '30%',
-    top: "33%",
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
+
   },
   cajacontent: {
-    height: "100%",
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
+    width: "100%",
   },
   caja: {
-    backgroundColor: "rgba(21, 0, 37, 1)",
-    justifyContent: "center",
-    width: "30%",
-    height: "100%",
-    flexDirection: "column",
     alignItems: "center",
-    marginHorizontal: 5,
+  },
+  cajadato: {
+
+    backgroundColor: "rgba(69, 28, 102, 0.61)",
+    borderRadius: 8,
+    width: 60,
+    height: 60,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  dato: {
+    color: "#FFFFFF",
+    fontSize: 24,
+    fontWeight: "bold",
   },
   cajatipodato: {
     marginTop: 5,
   },
   tipodato: {
-    color: "white",
     fontSize: 16,
+    color: "#FFFFFF",
   },
-  cajadato: {
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 5,
-  },
-  dato: {
-    color: "white",
-    fontSize: 32,
-    fontWeight: "bold",
-  },
-  inputcaja: {
-    width: "90%",
-    borderBottomWidth: 2,
-    borderBottomColor: '#ffffff',
-    flexDirection: "row",
+  button: {
+    bottom: "20%",
+    justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 5,
+    position: "absolute",
+    width: "70%",
+    height: "10%",
+    backgroundColor: "rgba(255, 255, 255, 1)",
+    borderRadius: 10,
   },
-  input: {
-    flex: 1,
-    color: "white",
-    fontSize: 16,
-    paddingLeft: 10,
+  buttonText: {
+    color: "#000",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });
 

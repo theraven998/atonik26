@@ -85,7 +85,7 @@ export default function home() {
   const fetchEvents = async (date) => {
     try {
       const response = await fetch(
-        `http://192.168.20.119:5000/api/events?date=${date}`,
+        `http://192.168.20.2:5000/api/events?date=${date}`,
         {
           method: "GET",
           headers: {

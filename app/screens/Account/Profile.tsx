@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -7,12 +7,13 @@ import {
   Alert,
   Image,
   Dimensions,
+  Pressable,
 } from "react-native";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { NavigationProp } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RootStackParamList } from "@/app/_layout";
-import {jwtDecode} from "jwt-decode"; 
-
+import { jwtDecode } from "jwt-decode";
+import { useNavigation, router } from "expo-router";
 
 const { width, height } = Dimensions.get("window");
 
@@ -25,6 +26,11 @@ const Profile: React.FC = () => {
   const [username, setUsername] = useState<string | null>(null);
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false, // Oculta el encabezado
+    });
+  }, [navigation]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -39,15 +45,21 @@ const Profile: React.FC = () => {
             setProfilePhoto(decodedToken.sub.profile_photo);
           } catch (decodingError) {
             Alert.alert("Error", "No se pudo decodificar el token");
-            navigation.navigate("Login");
+            router.push({
+              pathname: "/screens/Account/Login",
+            });
           }
         } else {
           Alert.alert("Error", "No se encontró el token");
-          navigation.navigate("Login");
+          router.push({
+            pathname: "/screens/Account/Login",
+          });
         }
       } catch (error) {
         Alert.alert("Error", "No se pudo obtener el token");
-        navigation.navigate("Login");
+        router.push({
+          pathname: "/screens/Account/Login",
+        });
       }
     };
 
@@ -58,7 +70,6 @@ const Profile: React.FC = () => {
     try {
       await AsyncStorage.removeItem("access_token");
       await AsyncStorage.removeItem("refresh_token");
-      navigation.navigate("Login");
     } catch (error) {
       Alert.alert("Error", "No se pudo cerrar sesión");
     }
@@ -72,9 +83,9 @@ const Profile: React.FC = () => {
           style={styles.logo}
         />
         <View style={styles.cajauser}>
-        <Text style={styles.welcomeText}>
-    {username ? username : "Cargando..."}
-  </Text>
+          <Text style={styles.welcomeText}>
+            {username ? username : "Cargando..."}
+          </Text>
         </View>
       </View>
       <View style={styles.middle}>
@@ -105,36 +116,48 @@ const Profile: React.FC = () => {
             </View>
           </View>
           <View style={styles.cajadescripcion}>
-            <Text style={styles.descripcion}>Soy pedro amante de las fogatas nocturnas</Text>
+            <Text style={styles.descripcion}>
+              Soy pedro amante de las fogatas nocturnas
+            </Text>
           </View>
         </View>
       </View>
       <View style={styles.cajaboton}>
-        <TouchableOpacity style={styles.button} onPress={handleLogout}>
-          <Text style={styles.buttonText}>SEGUIR</Text>
-        </TouchableOpacity>
+            <Pressable
+              onPress={handleLogout}
+            >
+              <Text style={styles.buttonText}>Seguir</Text>
+            </Pressable>
       </View>
       <View style={styles.cajainferior}>
         <View style={styles.cajaquien}>
-        <Text style={styles.userinferior}>
-          {username ? username  : "Cargando..."}
-        </Text>      
-        <Text style={styles.mensaje}>estara en estos eventos ...</Text>
+          <Text style={styles.userinferior}>
+            {username ? username : "Cargando..."}
+          </Text>
+          <Text style={styles.mensaje}>estara en estos eventos ...</Text>
         </View>
+      </View>
+      <View style={styles.cajaeventos}>
+        <View style={styles.cajaeventosimagenes}>
+          <Image
+            source={require("../../../assets/images/po1.png")}
+            style={styles.imageevents}
+          />
+          <Image
+            source={require("../../../assets/images/po2.png")}
+            style={styles.imageevents}
+          />
+          <Image
+            source={require("../../../assets/images/po1.png")}
+            style={styles.imageevents}
+          />
         </View>
-        <View style={styles.cajaeventos}>
-          <View style={styles.cajaeventosimagenes}>
-          <Image source={require("../../../assets/images/po1.png")} style={styles.imageevents}/>
-          <Image source={require("../../../assets/images/po2.png")} style={styles.imageevents}/>
-          <Image source={require("../../../assets/images/po1.png")} style={styles.imageevents}/>
-          </View>
-          <View style={styles.cajaeventosfechas}>
+        <View style={styles.cajaeventosfechas}>
           <Text style={styles.whitetext}>VIERNES 24</Text>
           <Text style={styles.whitetext}>VIERNES 24</Text>
           <Text style={styles.whitetext}>VIERNES 24</Text>
-
-          </View>
         </View>
+      </View>
       <View style={styles.barrainferior}>
         <Text>Barra Inferior</Text>
       </View>
@@ -200,7 +223,7 @@ const styles = StyleSheet.create({
   },
   cajaseguidores: {
     marginLeft: proportionalFontSize(5),
-    top: '2%',
+    top: "2%",
     width: "100%",
     height: "40%",
     flexDirection: "row",
@@ -238,7 +261,7 @@ const styles = StyleSheet.create({
     fontSize: proportionalFontSize(18),
   },
   cajadescripcion: {
-    position: 'absolute',
+    position: "absolute",
     width: "90%",
     height: "60%",
     left: "5%",
@@ -262,7 +285,6 @@ const styles = StyleSheet.create({
     height: "50%",
     backgroundColor: "rgba(255, 255, 255, 1)",
     borderRadius: 10,
-  
   },
   buttonText: {
     color: "black",
@@ -276,51 +298,51 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "10%",
   },
-  cajainferior:{
-    position:'absolute',
-    width:'100%',
-    height:'50%',
-    top:'50%'
+  cajainferior: {
+    position: "absolute",
+    width: "100%",
+    height: "50%",
+    top: "50%",
   },
 
-  userinferior:{
-    fontStyle: 'italic',
-    fontWeight: 'bold',
+  userinferior: {
+    fontStyle: "italic",
+    fontWeight: "bold",
     color: "white",
     fontSize: proportionalFontSize(16),
   },
-  cajaquien:{
-    marginLeft: '2%',
-    alignItems: 'center',
-    flexDirection:'row',
+  cajaquien: {
+    marginLeft: "2%",
+    alignItems: "center",
+    flexDirection: "row",
   },
-  mensaje:{
+  mensaje: {
     color: "white",
     fontSize: proportionalFontSize(16),
   },
-  cajaeventos:{
-    position: 'absolute',
-    bottom: '30%',
-    width: '100%',
-    height: '17%',
+  cajaeventos: {
+    position: "absolute",
+    bottom: "30%",
+    width: "100%",
+    height: "17%",
   },
-  cajaeventosimagenes:{
-    display: 'flex',
-    flexDirection: 'row',
-    width: '100%',
+  cajaeventosimagenes: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
   },
-  imageevents:{
+  imageevents: {
     width: 100,
     height: 100,
-    margin: 10, 
+    margin: 10,
   },
-  cajaeventosfechas:{
-    bottom: '0%',
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'row',
-    position: 'absolute',
-    justifyContent: 'space-around',
+  cajaeventosfechas: {
+    bottom: "0%",
+    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    position: "absolute",
+    justifyContent: "space-around",
   },
 
   barrainferior: {
@@ -334,7 +356,7 @@ const styles = StyleSheet.create({
   },
   whitetext: {
     color: "white",
-  }
+  },
 });
 
 export default Profile;
